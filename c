@@ -16,4 +16,3 @@ fi
 tsc --version
 echo Starting TypeScript compile
 tsc --rootDir src/ --outDir dist/
-echo TypeScript Compiled!
