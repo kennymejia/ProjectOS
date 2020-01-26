@@ -41,12 +41,12 @@ export class System extends Hardware {
         super(0, "SYS");
         console.log("Hello TSIRAM!");
 
-        //this.log("[****************** System Initialization started]");
+        this.log("[****************** System Initialization started]");
 
         /*
         Initialize all the hardware to the system (analogous to you assembling the physical components together)
          */
-        //this.log("[****************** Hardware Initialization - Begin]");
+        this.log("[****************** Hardware Initialization - Begin]");
 
         this._CPU = new Cpu();
         this._MEMORY = new Memory();
@@ -60,16 +60,16 @@ export class System extends Hardware {
         // register the keyboard with the interrupt controller
         // create interrupts
 
-        //this.log("[****************** Hardware Initialization - Complete]");
+        this.log("[****************** Hardware Initialization - Complete]");
 
         /*
         Start the system (Analogous to pressing the power button and having voltages flow through the components)
         When power is applied to the system clock (_CLOCK), it begins sending pulses to all clock observing hardware
         components so they can act on each clock cycle.
          */
-        //this.log("[****************** Starting System (applying power)]");
+        this.log("[****************** Starting System (applying power)]");
         this.startSystem();
-        //this.log("System running status: " + this.running);
+        this.log("System running status: " + this.running);
 
     }
 
