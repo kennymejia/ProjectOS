@@ -41,6 +41,7 @@ export class Cpu extends Hardware implements ClockListener{
 
     constructor() {
         super(0, "CPU");
+        this.log("CPU Created");
         this.pc = 0;
         this.acc = 0;
         this.xReg = 0;
@@ -88,6 +89,8 @@ export class Cpu extends Hardware implements ClockListener{
      * CPU acts on the clock pulse, implementation goes here.
      */
     public pulse(): void {
+
+        this.log("Received Clock Pulse" + " - " + "Clock Count: " +this.clockCount + " - " + "Mode: " + this.mode);
 
     }
 

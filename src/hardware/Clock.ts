@@ -12,9 +12,8 @@ export class Clock extends Hardware {
     constructor(cpu : Cpu, memory: Memory, interruptController: InterruptController) {
 
         super(0, "CLK");
+        this.log("Clock Created");
         this.clockListeningHardware = [];
-
-
     }
 
     public clockCount: number = 0;
@@ -26,7 +25,7 @@ export class Clock extends Hardware {
     }
 
     public sendPulse() {
-
+        this.log("Clock Pulse Initialized");
     }
 
     public startClock(delay:number) : boolean {

@@ -21,7 +21,7 @@ export class VirtualKeyboard extends Hardware implements Interrupt {
 
     constructor(interruptController: InterruptController) {
         super(0, "VKB");
-
+        this.log("Keyboard Created");
         this.isExecuting = false;
 
         this.irq = -1;                                       // IRQ num is assigned by the controller

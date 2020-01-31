@@ -7,6 +7,7 @@ import {Clock} from "./hardware/Clock";
 import {Hardware} from "./hardware/Hardware";
 import {InterruptController} from "./hardware/InterruptController";
 import {VirtualKeyboard} from "./hardware/VirtualKeyboard";
+import { threadId } from "worker_threads";
 
 // import statements for drivers
 
@@ -51,6 +52,7 @@ export class System extends Hardware {
         this._CPU = new Cpu();
         this._MEMORY = new Memory();
         this._IRQ_CONTROLLER = new InterruptController(this._CPU);
+
         // the clock gets passed all of the hardware listening for clock pulses
         this._CLOCK = new Clock(this._CPU, this._MEMORY, this._IRQ_CONTROLLER);
 
@@ -69,8 +71,8 @@ export class System extends Hardware {
          */
         this.log("[****************** Starting System (applying power)]");
         this.startSystem();
+        this._CLOCK.startClock(CLOCK_INTERVAL);
         this.log("System running status: " + this.running);
-
     }
 
     public startSystem(): boolean {

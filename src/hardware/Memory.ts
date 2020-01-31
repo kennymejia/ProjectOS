@@ -11,7 +11,7 @@ export class Memory extends Hardware implements ClockListener{
 
     constructor() {
         super(0, "RAM");
-
+        this.log("Memory Created");
         this.mar = 0;
         this.mdr = 0;
         this.isExecuting = false;
@@ -30,5 +30,6 @@ export class Memory extends Hardware implements ClockListener{
 
     public pulse(): void {
 
+        this.log("Received Clock Pulse");
     }
 }

@@ -9,9 +9,9 @@ export class InterruptController extends Hardware implements ClockListener{
     constructor(cpu: Cpu) {
 
         super(0, "IRC");
+        this.log("Interrupt Controller Created");
         this.irqHardware = [];
         this.irqRequests = [];
-
         this.cpu = cpu;
 
     }
@@ -52,6 +52,7 @@ export class InterruptController extends Hardware implements ClockListener{
      */
     pulse(): void {
 
+        this.log("Received Clock Pulse" + " - " + "Current Queue: " + this.irqRequests.length);
 
     }
 }
