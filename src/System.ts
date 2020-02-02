@@ -77,7 +77,6 @@ export class System extends Hardware {
 
     public startSystem(): boolean {
 
-
         return false;
     }
 

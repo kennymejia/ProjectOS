@@ -36,6 +36,7 @@
 import {Hardware} from "./Hardware";
 import {ClockListener} from "./imp/ClockListener";
 import {Interrupt} from "./imp/Interrupt";
+import { cpus } from "os";
 
 export class Cpu extends Hardware implements ClockListener{
 
@@ -89,9 +90,8 @@ export class Cpu extends Hardware implements ClockListener{
      * CPU acts on the clock pulse, implementation goes here.
      */
     public pulse(): void {
-
+        this.clockCount++;
         this.log("Received Clock Pulse" + " - " + "Clock Count: " +this.clockCount + " - " + "Mode: " + this.mode);
-
     }
 
     /**
