@@ -35,7 +35,7 @@ export class VirtualKeyboard extends Hardware implements Interrupt {
         this.monitorKeys();
 
     }
-
+    
     public isExecuting : boolean;
 
     // reference to the interrupt controller
@@ -69,7 +69,7 @@ export class VirtualKeyboard extends Hardware implements Interrupt {
         stdin.setEncoding( 'utf8' );
 
         // on any data into stdin
-        stdin.on( 'data', function( key ){
+        stdin.on('data', function( key ){
 
             // ctrl-c ( end of text )
             // this let's us break out with ctrl-c
@@ -77,7 +77,17 @@ export class VirtualKeyboard extends Hardware implements Interrupt {
                 process.exit();
             }
 
-
+            // had problem where input buffer would stay null so...
+            // checking to see if null and then setting it so something else
+            // so we can simply keep adding key presses
+            if (this.inputBuffer == null) {
+                this.inputBuffer = key;
+            }
+            this.inputBuffer = this.inputBuffer+key;
+            
+            this.interruptController.acceptInterrupt();
+            
+            this.log("Key Pressed: " + key);
 
             // .bind(this) is required when running an asynchronous process in node that wishes to reference an
             // instance of an object.

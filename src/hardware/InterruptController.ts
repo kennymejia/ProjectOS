@@ -2,6 +2,7 @@ import {Hardware} from "./Hardware";
 import {Interrupt} from "./imp/Interrupt";
 import {ClockListener} from "./imp/ClockListener";
 import {Cpu} from "./Cpu";
+import { getPriority } from "os";
 
 
 export class InterruptController extends Hardware implements ClockListener{
@@ -40,6 +41,10 @@ export class InterruptController extends Hardware implements ClockListener{
         irqHardware.irq = this.irqHardware.length;
 
         this.irqHardware.push(irqHardware);
+        
+        this.log( "IRQ: " + this.irqHardware[irqHardware.irq].irq + 
+                  " Assigned to Name: " + this.irqHardware[irqHardware.irq].name + 
+                  " Added - Priority: " + this.irqHardware[irqHardware.irq].priority );
 
     }
 

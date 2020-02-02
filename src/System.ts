@@ -58,10 +58,13 @@ export class System extends Hardware {
 
         // create IO Hardware
         this._KEYBOARD = new VirtualKeyboard(this._IRQ_CONTROLLER);
-
+        
         // register the keyboard with the interrupt controller
+        this._IRQ_CONTROLLER.addIrq(this._KEYBOARD);
+        
         // create interrupts
-
+        
+        
         this.log("[****************** Hardware Initialization - Complete]");
 
         /*
