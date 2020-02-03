@@ -83,7 +83,9 @@ export class Cpu extends Hardware implements ClockListener{
      * @param interrupt
      */
     public setInterrupt(interrupt: Interrupt): void {
+
         this.interrupt = interrupt;
+        this.log("Interrupts Remaining In the CPU Queue: " + interrupt.outputBuffer.length);
     }
 
     /**

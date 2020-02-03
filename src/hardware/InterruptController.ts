@@ -3,6 +3,7 @@ import {Interrupt} from "./imp/Interrupt";
 import {ClockListener} from "./imp/ClockListener";
 import {Cpu} from "./Cpu";
 import { getPriority } from "os";
+import { stringify } from "querystring";
 
 
 export class InterruptController extends Hardware implements ClockListener{
@@ -49,7 +50,25 @@ export class InterruptController extends Hardware implements ClockListener{
     }
 
     public acceptInterrupt(interrupt: Interrupt) {
+
         this.irqRequests.push(interrupt);
+        
+            
+        if(this.irqRequests[this.irqRequests.length-1].priority == -1) {
+
+        }
+        else if(this.irqRequests[this.irqRequests.length-1].priority == 0) {
+
+            this.cpu.setInterrupt(interrupt);
+                
+        }
+        else if(this.irqRequests[this.irqRequests.length-1].priority == 1) {        
+
+        }
+        else if(this.irqRequests[this.irqRequests.length-1].priority == 2) {
+                
+        }
+
     }
 
     /*
@@ -57,7 +76,8 @@ export class InterruptController extends Hardware implements ClockListener{
      */
     pulse(): void {
 
-        this.log("Received Clock Pulse" + " - " + "Current Queue: " + this.irqRequests.length);
-
+        if (this.irqRequests.length > 0)
+            this.log("Received Clock Pulse" + " - " + "Current Queue: " + this.irqRequests.length);
+        
     }
 }

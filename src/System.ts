@@ -76,6 +76,8 @@ export class System extends Hardware {
         this.startSystem();
         this._CLOCK.startClock(CLOCK_INTERVAL);
         this.log("System running status: " + this.running);
+        console.log("********************************************************************************************************");
+        console.log("********************************************************************************************************");
     }
 
     public startSystem(): boolean {
