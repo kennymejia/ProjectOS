@@ -31,9 +31,9 @@ export class Clock extends Hardware {
 
     public sendPulse(): void {
         this.log("Clock Pulse Initialized");
-        this.clockListeningHardware[0].pulse();
-        this.clockListeningHardware[1].pulse();
         this.clockListeningHardware[2].pulse();
+        this.clockListeningHardware[1].pulse();
+        this.clockListeningHardware[0].pulse();
     }
 
     public startClock(delay:number) : boolean {

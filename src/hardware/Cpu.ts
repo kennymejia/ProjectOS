@@ -87,23 +87,6 @@ export class Cpu extends Hardware implements ClockListener{
     public setInterrupt(interrupt: Interrupt): void {
 
         this.interrupt = interrupt;
-        
-        // interrupt is from the keyboard so we deal with it a certain way
-        // for now output is the length of the queue and what is in the queue
-        if (interrupt.name == "VKB") {
-            
-            this.log("Interrupts Remaining In the CPU Queue: " + interrupt.outputBuffer.length);
-        
-            var queueOutput = "";
-            for(var index = 0; index < interrupt.outputBuffer.length; index++) {
-
-                queueOutput = queueOutput + "[" + interrupt.outputBuffer[index] + "]" + " ";
-            }
-
-            this.log("Queue: " + queueOutput);
-
-            //interrupt.outputBuffer = interrupt.outputBuffer.slice(0,interrupt.outputBuffer.length-2);
-        }
 
     }
 
@@ -111,8 +94,33 @@ export class Cpu extends Hardware implements ClockListener{
      * CPU acts on the clock pulse, implementation goes here.
      */
     public pulse(): void {
+        
         this.clockCount++;
         this.log("Received Clock Pulse" + " - " + "Clock Count: " +this.clockCount + " - " + "Mode: " + this.mode);
+
+        this.fetch();
+
+        this.decode();
+
+        this.execute();
+
+
+        if(this.interrupt != null && this.interrupt.outputBuffer.length > 0)
+        {
+            this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name) ;
+
+            var queueOutput = "";
+            for(var index = 0; index < this.interrupt.outputBuffer.length; index++) {
+
+                queueOutput = queueOutput + "[" + this.interrupt.outputBuffer[index] + "]" + " ";
+            }
+
+            this.log("CPU Queue Contents: " + queueOutput);
+
+            this.interrupt.outputBuffer = this.interrupt.outputBuffer.slice(1);
+
+        }
+
     }
 
     /**

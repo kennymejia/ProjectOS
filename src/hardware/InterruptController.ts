@@ -53,21 +53,26 @@ export class InterruptController extends Hardware implements ClockListener{
 
         this.irqRequests.push(interrupt);
         
-            
-        if(this.irqRequests[this.irqRequests.length-1].priority == -1) {
+        // highest priority interrupt is on top and lowest is on the bottom 
+        if(this.irqRequests[this.irqRequests.length-1].priority == 2) {
 
         }
-        else if(this.irqRequests[this.irqRequests.length-1].priority == 0) {
 
-            this.cpu.setInterrupt(interrupt);
+        else if(this.irqRequests[this.irqRequests.length-1].priority == 1) {
                 
         }
-        else if(this.irqRequests[this.irqRequests.length-1].priority == 1) {        
 
+        else if(this.irqRequests[this.irqRequests.length-1].priority == 0) {        
+
+            // sending the interrupt to the CPU
+            this.cpu.setInterrupt(this.irqRequests[this.irqRequests.length-1]);
         }
-        else if(this.irqRequests[this.irqRequests.length-1].priority == 2) {
+
+        else if(this.irqRequests[this.irqRequests.length-1].priority == -1) {
                 
         }
+
+        this.irqRequests.pop();
 
     }
 
@@ -77,7 +82,7 @@ export class InterruptController extends Hardware implements ClockListener{
     pulse(): void {
 
         if (this.irqRequests.length > 0)
-            this.log("Received Clock Pulse" + " - " + "Current Queue: " + this.irqRequests.length);
+            this.log("Received Clock Pulse" + " - " + "Current Queue Size: " + this.irqRequests.length);
         
     }
 }

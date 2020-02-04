@@ -79,16 +79,9 @@ export class VirtualKeyboard extends Hardware implements Interrupt {
 
             this.log("Key Pressed: " + key);
 
-            // had problem where input buffer would stay null so...
-            // checking to see if null and then setting it so something else
-            // so we can simply keep adding key presses
-            if (this.outputBuffer == null) {
-                this.outputBuffer = key;
-            }
-            else {
-                this.outputBuffer = this.outputBuffer + key;
-            }
+            this.outputBuffer = key;
 
+            // sending the VKB to the interrupt controller
             this.interruptController.acceptInterrupt(this);
 
             // .bind(this) is required when running an asynchronous process in node that wishes to reference an
