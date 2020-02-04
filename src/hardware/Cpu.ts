@@ -81,11 +81,30 @@ export class Cpu extends Hardware implements ClockListener{
     /**
      * Send the CPU an interrupt here!
      * @param interrupt
+     * 
+     * 
      */
     public setInterrupt(interrupt: Interrupt): void {
 
         this.interrupt = interrupt;
-        this.log("Interrupts Remaining In the CPU Queue: " + interrupt.outputBuffer.length);
+        
+        // interrupt is from the keyboard so we deal with it a certain way
+        // for now output is the length of the queue and what is in the queue
+        if (interrupt.name == "VKB") {
+            
+            this.log("Interrupts Remaining In the CPU Queue: " + interrupt.outputBuffer.length);
+        
+            var queueOutput = "";
+            for(var index = 0; index < interrupt.outputBuffer.length; index++) {
+
+                queueOutput = queueOutput + "[" + interrupt.outputBuffer[index] + "]" + " ";
+            }
+
+            this.log("Queue: " + queueOutput);
+
+            //interrupt.outputBuffer = interrupt.outputBuffer.slice(0,interrupt.outputBuffer.length-2);
+        }
+
     }
 
     /**
@@ -117,6 +136,7 @@ export class Cpu extends Hardware implements ClockListener{
     private execute(): void {
 
     }
+    
 }
 
 

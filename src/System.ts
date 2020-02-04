@@ -40,6 +40,10 @@ export class System extends Hardware {
 
     constructor() {
         super(0, "SYS");
+
+        console.log("********************************************************************************************************");
+        console.log("********************************************************************************************************");
+
         console.log("Hello TSIRAM!");
 
         this.log("[****************** System Initialization started]");
