@@ -51,6 +51,8 @@ export class InterruptController extends Hardware implements ClockListener {
     // accepting the interrupt from other devices
     public acceptInterrupt(interrupt: Interrupt) {
 
+        console.log(interrupt.outputBuffer.printQueue());
+
         // accepting the interrupt from the hardware
         this.irqRequests.push(interrupt);
     }
@@ -61,7 +63,7 @@ export class InterruptController extends Hardware implements ClockListener {
     pulse(): void {
 
         // sending irq requests to the cpu one at a time
-        if (this.irqRequests != null && this.irqRequests.length > 0) {
+        if (this.irqRequests.length > 0) {
 
             // logging the queue size and confirmation about the pulse
             this.log("Received Clock Pulse" + " - " + "Current Queue Size: " + this.irqRequests.length);
@@ -75,7 +77,9 @@ export class InterruptController extends Hardware implements ClockListener {
                     // check current element to see if its the highest priority
                     if(this.irqRequests[index].priority == priority) {
                         // sending the interrupt to the CPU and removing it from the irqRequests
-                        this.cpu.setInterrupt(this.irqRequests.shift());
+                        this.cpu.setInterrupt(this.irqRequests[index]);
+                        this.irqRequests.splice(index,1);
+                        break;
                     }
                         
                 }
