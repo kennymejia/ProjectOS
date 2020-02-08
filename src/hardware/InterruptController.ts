@@ -2,11 +2,10 @@ import {Hardware} from "./Hardware";
 import {Interrupt} from "./imp/Interrupt";
 import {ClockListener} from "./imp/ClockListener";
 import {Cpu} from "./Cpu";
-import { getPriority } from "os";
-import { stringify } from "querystring";
+import {getPriority} from "os";
+import {stringify} from "querystring";
 
-
-export class InterruptController extends Hardware implements ClockListener{
+export class InterruptController extends Hardware implements ClockListener {
 
     constructor(cpu: Cpu) {
 
@@ -15,7 +14,6 @@ export class InterruptController extends Hardware implements ClockListener{
         this.irqHardware = [];
         this.irqRequests = [];
         this.cpu = cpu;
-
     }
 
     public isExecuting: boolean = false;
@@ -24,12 +22,13 @@ export class InterruptController extends Hardware implements ClockListener{
     private irqHardware: Interrupt[];
 
     // Contains a buffer of IRQ hardware currently requesting a interrupt
-    private irqRequests: Interrupt[];
+    public irqRequests: Interrupt[];
 
     // The interrupt controller needs to know how to talk to the CPU, to send interrupts
-    private cpu: Cpu;
+    public cpu: Cpu;
 
     public init(): void {
+
         this.isExecuting = false;
     }
 
@@ -49,40 +48,38 @@ export class InterruptController extends Hardware implements ClockListener{
 
     }
 
+    // accepting the interrupt from other devices
     public acceptInterrupt(interrupt: Interrupt) {
 
+        // accepting the interrupt from the hardware
         this.irqRequests.push(interrupt);
-        
-        // highest priority interrupt is on top and lowest is on the bottom 
-        if(this.irqRequests[this.irqRequests.length-1].priority == 2) {
-
-        }
-
-        else if(this.irqRequests[this.irqRequests.length-1].priority == 1) {
-                
-        }
-
-        else if(this.irqRequests[this.irqRequests.length-1].priority == 0) {        
-
-            // sending the interrupt to the CPU
-            this.cpu.setInterrupt(this.irqRequests[this.irqRequests.length-1]);
-        }
-
-        else if(this.irqRequests[this.irqRequests.length-1].priority == -1) {
-                
-        }
-
-        this.irqRequests.pop();
-
     }
 
     /*
-
+        Interrupt Controller acts on the clock pulse, implementation goes here.
      */
     pulse(): void {
 
-        if (this.irqRequests.length > 0)
+        // sending irq requests to the cpu one at a time
+        if (this.irqRequests != null && this.irqRequests.length > 0) {
+
+            // logging the queue size and confirmation about the pulse
             this.log("Received Clock Pulse" + " - " + "Current Queue Size: " + this.irqRequests.length);
-        
+            
+            // looping through the priorities starting with the highest
+            for (let priority = 2; priority > -2; priority--) {
+                
+                // looping each irqRequest starting with the first one to see if its the highest priority
+                for (let index = 0; index < this.irqRequests.length; index++) {
+    
+                    // check current element to see if its the highest priority
+                    if(this.irqRequests[index].priority == priority) {
+                        // sending the interrupt to the CPU and removing it from the irqRequests
+                        this.cpu.setInterrupt(this.irqRequests.shift());
+                    }
+                        
+                }
+            }                
+        }
     }
 }

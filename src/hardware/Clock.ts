@@ -26,14 +26,15 @@ export class Clock extends Hardware {
     private clockListeningHardware: ClockListener[];
 
     private addHardware(clockListener: ClockListener) {
+        
         this.clockListeningHardware.push(clockListener);
     }
 
     public sendPulse(): void {
         this.log("Clock Pulse Initialized");
-        this.clockListeningHardware[2].pulse();
-        this.clockListeningHardware[1].pulse();
-        this.clockListeningHardware[0].pulse();
+        
+        // one elegant line of code calling the pulse method on each hardware piece
+        this.clockListeningHardware.forEach(element => element.pulse());
     }
 
     public startClock(delay:number) : boolean {

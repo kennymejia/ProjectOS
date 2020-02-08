@@ -37,6 +37,7 @@ import {Hardware} from "./Hardware";
 import {ClockListener} from "./imp/ClockListener";
 import {Interrupt} from "./imp/Interrupt";
 import { cpus } from "os";
+import { VirtualKeyboard } from "./VirtualKeyboard";
 
 export class Cpu extends Hardware implements ClockListener{
 
@@ -52,7 +53,7 @@ export class Cpu extends Hardware implements ClockListener{
         this.mode = Cpu.Mode.KERNEL;
         this.isExecuting = false;
         this.clockCount = 0;
-
+        this.virtualkeyboard;
     }
 
     public pc: number;
@@ -64,6 +65,7 @@ export class Cpu extends Hardware implements ClockListener{
     public mode: Cpu.Mode;
     public isExecuting: boolean;
     public clockCount: number;
+    public virtualkeyboard: VirtualKeyboard;
 
     public reset(): void {
         this.pc = 0;
@@ -81,13 +83,10 @@ export class Cpu extends Hardware implements ClockListener{
     /**
      * Send the CPU an interrupt here!
      * @param interrupt
-     * 
-     * 
      */
     public setInterrupt(interrupt: Interrupt): void {
 
         this.interrupt = interrupt;
-
     }
 
     /**
@@ -98,29 +97,13 @@ export class Cpu extends Hardware implements ClockListener{
         this.clockCount++;
         this.log("Received Clock Pulse" + " - " + "Clock Count: " +this.clockCount + " - " + "Mode: " + this.mode);
 
-        this.fetch();
-
-        this.decode();
-
-        this.execute();
-
-
-        if(this.interrupt != null && this.interrupt.outputBuffer.length > 0)
-        {
-            this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name) ;
-
-            var queueOutput = "";
-            for(var index = 0; index < this.interrupt.outputBuffer.length; index++) {
-
-                queueOutput = queueOutput + "[" + this.interrupt.outputBuffer[index] + "]" + " ";
-            }
-
-            this.log("CPU Queue Contents: " + queueOutput);
-
-            this.interrupt.outputBuffer = this.interrupt.outputBuffer.slice(1);
-
+        if (this.interrupt != null && this.interrupt.name == "VKB") {
+            
+            this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
+            this.log(this.interrupt.outputBuffer.printQueue());
+            this.interrupt.outputBuffer.dequeue();
         }
-
+        
     }
 
     /**
