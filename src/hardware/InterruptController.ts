@@ -51,8 +51,6 @@ export class InterruptController extends Hardware implements ClockListener {
     // accepting the interrupt from other devices
     public acceptInterrupt(interrupt: Interrupt) {
 
-        console.log(interrupt.outputBuffer.printQueue());
-
         // accepting the interrupt from the hardware
         this.irqRequests.push(interrupt);
     }
