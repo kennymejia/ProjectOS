@@ -21,7 +21,7 @@ const KERNEL: Kernel.Kernel = require("./kernel/Kernel");
  */
 // Initialization Parameters for Hardware
 // Clock cycle interval
-const CLOCK_INTERVAL= 2000;               // This is in ms (milliseconds) so 1000 = 1 second, 100 = 1/10 second
+const CLOCK_INTERVAL= 500;               // This is in ms (milliseconds) so 1000 = 1 second, 100 = 1/10 second
                                         // A setting of 100 is equivalent to 10hz, 1 would be 1,000hz or 1khz,
                                         // .001 would be 1,000,000 or 1mhz. Obviously you will want to keep this
                                         // small, I recommend a setting of 100, if you want to slow things down
@@ -41,10 +41,11 @@ export class System extends Hardware {
     constructor() {
         super(0, "SYS");
 
+        // dividers for aesthetics
         console.log("********************************************************************************************************");
         console.log("********************************************************************************************************");
 
-        console.log("Hello TSIRAM!");
+        console.log("Welcome Back TSIRAM!");
 
         this.log("[****************** System Initialization started]");
 
@@ -80,6 +81,8 @@ export class System extends Hardware {
         this.startSystem();
         this._CLOCK.startClock(CLOCK_INTERVAL);
         this.log("System running status: " + this.running);
+
+        // dividers for aesthetics
         console.log("********************************************************************************************************");
         console.log("********************************************************************************************************");
     }

@@ -97,6 +97,10 @@ export class Cpu extends Hardware implements ClockListener{
         this.clockCount++;
         this.log("Received Clock Pulse" + " - " + "Clock Count: " + this.clockCount + " - " + "Mode: " + this.mode);
 
+        this.fetch();
+        this.decode();
+        this.decode();
+
         if (this.interrupt != null && this.interrupt.name == "VKB" && this.interrupt.outputBuffer.isEmpty()!=true) {
             
             this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
