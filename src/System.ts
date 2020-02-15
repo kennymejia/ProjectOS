@@ -8,6 +8,7 @@ import {Hardware} from "./hardware/Hardware";
 import {InterruptController} from "./hardware/InterruptController";
 import {VirtualKeyboard} from "./hardware/VirtualKeyboard";
 import { threadId } from "worker_threads";
+import { MemoryManagementUnit } from "./hardware/MemoryManagementUnit";
 
 // import statements for drivers
 
@@ -34,7 +35,8 @@ export class System extends Hardware {
     private _MEMORY: Memory = null;
     private _IRQ_CONTROLLER: InterruptController = null;
     private _CLOCK: Clock = null;
-    private _KEYBOARD: VirtualKeyboard;
+    private _KEYBOARD: VirtualKeyboard = null;
+    private _MemoryManagementUnit: MemoryManagementUnit = null;
 
     public running: boolean = false;
 
@@ -53,9 +55,9 @@ export class System extends Hardware {
         Initialize all the hardware to the system (analogous to you assembling the physical components together)
          */
         this.log("[****************** Hardware Initialization - Begin]");
-
         this._CPU = new Cpu();
         this._MEMORY = new Memory();
+        this._MemoryManagementUnit = new MemoryManagementUnit(this._CPU,this._MEMORY);
         this._IRQ_CONTROLLER = new InterruptController(this._CPU);
 
         // the clock gets passed all of the hardware listening for clock pulses
