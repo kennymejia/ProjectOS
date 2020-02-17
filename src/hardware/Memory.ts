@@ -15,6 +15,7 @@ export class Memory extends Hardware implements ClockListener{
         this.mdr = 0x00;
         this.memory = new Array (65536);
         this.isExecuting = false;
+        this.reset();
         this.log("Memory Created - Addressable Space: " + this.memory.length);
     }
 
@@ -51,5 +52,21 @@ export class Memory extends Hardware implements ClockListener{
         this.memory[this.mar] = this.mdr;
 
         this.log("Data Received Setting Now")
+    }
+
+    public getMAR (): number {
+        return this.mar;
+    }
+
+    public getMDR (): number {
+        return this.mdr;
+    }
+
+    public setMAR (mar: number) {
+        this.mar = mar;
+    }
+
+    public setMDR (mdr: number) {
+        this.mdr = mdr;
     }
 }
