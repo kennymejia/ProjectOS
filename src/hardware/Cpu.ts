@@ -95,7 +95,7 @@ export class Cpu extends Hardware implements ClockListener{
     public pulse(): void {
         
         this.clockCount++;
-        this.log("Received Clock Pulse" + " - " + "Clock Count: " + this.clockCount + " - " + "Mode: " + this.mode);
+        this.log("CPU Received Clock Pulse" + " - " + "Clock Count: " + this.clockCount + " - " + "Mode: " + this.mode);
 
         this.fetch();
         this.decode();

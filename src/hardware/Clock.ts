@@ -31,7 +31,7 @@ export class Clock extends Hardware {
     }
 
     public sendPulse(): void {
-        this.log("Clock Pulse Initialized");
+        this.log("Clock Pulse Sent To Hardware");
         
         // one elegant line of code calling the pulse method on each hardware piece
         this.clockListeningHardware.forEach(element => element.pulse());

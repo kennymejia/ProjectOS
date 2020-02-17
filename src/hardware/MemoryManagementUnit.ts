@@ -14,7 +14,7 @@ export class MemoryManagementUnit extends Hardware {
         this.memory = memory;
         this.endianArray = [];
 
-        // FLASHING MEMORY GOES HERE ?
+        // instruction set used to flash memory
         let instructionSet = [
             0xA9, 
             0x0D, 
@@ -34,7 +34,7 @@ export class MemoryManagementUnit extends Hardware {
             this.writeImmediate(instruction, instructionSet[instruction]);
         }
 
-        this.memoryDump(0x0000,0x000A);
+        this.memoryDump(0x0000,0x000F);
     }
 
     // MMU knows about both the CPU and the Memory
@@ -63,18 +63,11 @@ export class MemoryManagementUnit extends Hardware {
 
         if (this.endianArray.length == 0) {
 
-            let tempArray = Array.from(address8Bit);
-
-            // NOT SURE IF THIS WILL WORK MAY HAVE TO REFORMAT
-
-            this.endianArray[2] = tempArray[0];
-            this.endianArray[3] = tempArray[1];
+            this.endianArray[1] = address8Bit;
         }
         else {
 
-            let tempArray = Array.from(address8Bit);
-            this.endianArray[0] = tempArray[0];
-            this.endianArray[1] = tempArray[1];
+            this.endianArray[0] = address8Bit;
 
             let address16Bit = +this.endianArray.toString();
 
@@ -111,15 +104,21 @@ export class MemoryManagementUnit extends Hardware {
         let memoryDumpArray = [];
         let memory = this.memory.getMemory();
 
-        memoryDumpArray = memory.slice(startAddress,endAddress);
+        memoryDumpArray = memory.slice(startAddress,endAddress+1);
 
-        this.log("Debug Mode: ON - Memory Dump Initialized");
+        this.log("Debug Mode: Memory Dump Initialized");
+        
         this.log("-------------------------------------------------------------");
-        for (startAddress; startAddress<= endAddress; ++startAddress) {
+        for (startAddress; startAddress<= endAddress; startAddress++) {
 
-            this.log("Addr: " + startAddress + "    | " + memoryDumpArray[startAddress])
+            this.log (
+                
+                "Addr: " + startAddress.toString(16).toLocaleUpperCase().padStart(6,"0x0000") + 
+                "    | " + memoryDumpArray[startAddress].toString(16).padStart(2,"0").toUpperCase()
+            );
         }
         this.log("-------------------------------------------------------------");
-        this.log("Debug Mode: ON - Memory Dump Complete");
+        
+        this.log("Debug Mode: Memory Dump Complete");
     }
  }
