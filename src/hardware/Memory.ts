@@ -21,7 +21,7 @@ export class Memory extends Hardware implements ClockListener{
 
     private mar: number;
     private mdr: number;
-    private memory: Array<number>;
+    private memory: number[];
     private isExecuting: boolean;
 
     public reset(): void {
@@ -68,5 +68,10 @@ export class Memory extends Hardware implements ClockListener{
 
     public setMDR (mdr: number) {
         this.mdr = mdr;
+    }
+
+    public getMemory (): number[] {
+
+        return this.memory;
     }
 }

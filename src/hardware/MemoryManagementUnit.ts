@@ -1,6 +1,7 @@
 import {Hardware} from "./Hardware";
 import { Cpu } from "./Cpu";
 import { Memory } from "./Memory";
+import { start } from "repl";
 
 export class MemoryManagementUnit extends Hardware {
 
@@ -12,6 +13,28 @@ export class MemoryManagementUnit extends Hardware {
         this.cpu = cpu;
         this.memory = memory;
         this.endianArray = [];
+
+        // FLASHING MEMORY GOES HERE ?
+        let instructionSet = [
+            0xA9, 
+            0x0D, 
+            0xA9, 
+            0x1D, 
+            0xA9, 
+            0x2D, 
+            0xA9, 
+            0x3F, 
+            0xA9, 
+            0xFF, 
+            0x00
+        ];
+
+        for (let instruction = 0x0000; instruction < instructionSet.length; instruction++) {
+
+            this.writeImmediate(instruction, instructionSet[instruction]);
+        }
+
+        this.memoryDump(0x0000,0x000A);
     }
 
     // MMU knows about both the CPU and the Memory
@@ -80,6 +103,23 @@ export class MemoryManagementUnit extends Hardware {
 
         this.memory.setMAR(address);
         this.memory.setMDR(data);
-        this.memory.write;
+        this.memory.write();
+    }
+
+    public memoryDump (startAddress: number, endAddress: number) {
+
+        let memoryDumpArray = [];
+        let memory = this.memory.getMemory();
+
+        memoryDumpArray = memory.slice(startAddress,endAddress);
+
+        this.log("Debug Mode: ON - Memory Dump Initialized");
+        this.log("-------------------------------------------------------------");
+        for (startAddress; startAddress<= endAddress; ++startAddress) {
+
+            this.log("Addr: " + startAddress + "    | " + memoryDumpArray[startAddress])
+        }
+        this.log("-------------------------------------------------------------");
+        this.log("Debug Mode: ON - Memory Dump Complete");
     }
  }
