@@ -53,7 +53,7 @@ export class Cpu extends Hardware implements ClockListener{
         this.mode = Cpu.Mode.KERNEL;
         this.isExecuting = false;
         this.clockCount = 0;
-        this.virtualkeyboard;
+        this.pipelineStep = "";
     }
 
     public pc: number;
@@ -65,7 +65,7 @@ export class Cpu extends Hardware implements ClockListener{
     public mode: Cpu.Mode;
     public isExecuting: boolean;
     public clockCount: number;
-    public virtualkeyboard: VirtualKeyboard;
+    public pipelineStep: String; 
 
     public reset(): void {
         this.pc = 0;
@@ -97,18 +97,25 @@ export class Cpu extends Hardware implements ClockListener{
         this.clockCount++;
         this.log("CPU Received Clock Pulse" + " - " + "Clock Count: " + this.clockCount + " - " + "Mode: " + this.mode);
 
-        this.fetch();
-        this.decode();
-        this.decode();
+        if (this.pipelineStep == "fetch") {
 
-        if (this.interrupt != null && this.interrupt.name == "VKB" && this.interrupt.outputBuffer.isEmpty()!=true) {
-            
-            this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
-            this.log("CPU Sees: " + this.interrupt.outputBuffer.printQueue());
-            this.interrupt.outputBuffer.dequeue();
-            
+            this.fetch();
         }
         
+        else if (this.pipelineStep == "decode") {
+
+            this.decode();
+        }
+
+        else if (this.pipelineStep == "execute") {
+
+            this.execute();
+        }
+
+        
+        this.writeBack();
+
+        this.interruptCheck();
     }
 
     /**
@@ -130,6 +137,22 @@ export class Cpu extends Hardware implements ClockListener{
      * Executes the current instruction in the pipline
      */
     private execute(): void {
+
+    }
+
+    private writeBack(): void {
+
+    }
+
+    private interruptCheck(): void {
+
+        if (this.interrupt != null && this.interrupt.name == "VKB" && this.interrupt.outputBuffer.isEmpty()!=true) {
+            
+            this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
+            this.log("CPU Sees: " + this.interrupt.outputBuffer.printQueue());
+            this.interrupt.outputBuffer.dequeue();
+            
+        }
 
     }
     
