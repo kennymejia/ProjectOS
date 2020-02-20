@@ -11,13 +11,22 @@ export class Hardware {
 
     public id: number = 0;
     public name: String = "";
-    public debug: boolean = true;
-    public date: Date = new Date();
+    private debug: boolean = false;
+    private cpuDebug: boolean = true;
+    private date: Date = new Date();
     
+    // used for general debugging, may go back and create seperate logs for everything
     protected log(message: String): void {
         
         if (this.debug) 
             console.log("[", "HW -", this.name, "ID:", this.id, "-", this.date.getTime(), "]:", message);
+    }
+
+    // used for CPU debugging
+    protected cpuLog(message: String): void {
+        
+        if (this.cpuDebug) 
+            console.log("[", "HW -", this.name, "ID:", this.id, "-", "]:", message);
     }
 
 }

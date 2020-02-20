@@ -43,15 +43,11 @@ export class Memory extends Hardware implements ClockListener{
     public read (): void {
         
         this.mdr = this.memory[this.mar];
-        
-        //this.log("Address Received Reading Data")
     }
 
     public write (): void {
 
         this.memory[this.mar] = this.mdr;
-
-        //this.log("Data Received Setting Now")
     }
 
     public getMAR (): number {

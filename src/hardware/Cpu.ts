@@ -44,11 +44,12 @@ export class Cpu extends Hardware implements ClockListener{
     constructor() {
         super(0, "CPU");
         this.log("CPU Created");
-        this.pc = 0;
-        this.acc = 0;
-        this.xReg = 0;
-        this.yReg = 0;
-        this.zFlag = 0;
+        this.pc = 0x0000;
+        this.ir = 0x00;
+        this.acc = 0x00;
+        this.xReg = 0x00;
+        this.yReg = 0x00;
+        this.zFlag = 0x00;
         this.interrupt = null;
         this.mode = Cpu.Mode.KERNEL;
         this.isExecuting = false;
@@ -57,6 +58,7 @@ export class Cpu extends Hardware implements ClockListener{
     }
 
     public pc: number;
+    public ir: number;
     public acc: number;
     public xReg: number;
     public yReg: number;
@@ -68,11 +70,12 @@ export class Cpu extends Hardware implements ClockListener{
     public pipelineStep: String; 
 
     public reset(): void {
-        this.pc = 0;
-        this.acc = 0;
-        this.xReg = 0;
-        this.yReg = 0;
-        this.zFlag = 0;
+        this.pc = 0x0000;
+        this.ir = 0x00;
+        this.acc = 0x00;
+        this.xReg = 0x00;
+        this.yReg = 0x00;
+        this.zFlag = 0x00;
         this.interrupt = null;
         this.mode = Cpu.Mode.KERNEL;
         this.isExecuting = false;
@@ -97,24 +100,43 @@ export class Cpu extends Hardware implements ClockListener{
         this.clockCount++;
         this.log("CPU Received Clock Pulse" + " - " + "Clock Count: " + this.clockCount + " - " + "Mode: " + this.mode);
 
-        if (this.pipelineStep == "fetch") {
+        this.cpuLog(
+            "CPU State  | " + 
+            " PC: " + this.pc.toString(16).toLocaleUpperCase().padStart(6,"0x0000") +
+            " IR: " + this.ir +
+            " ACC: " + this.acc +
+            " xReg: " + this.xReg +
+            " yReg: " + this.yReg +
+            " zFlag: " + this.zFlag +
+            " ClockCount: " + this.clockCount
+        );
 
-            this.fetch();
+        switch (this.pipelineStep) {
+
+            case 'fetch':
+                this.cpuLog("Fetching: ");
+                this.fetch();
+                break;
+            
+            case 'decode':
+                this.cpuLog("Decoding: ");
+                this.decode();
+                break;
+
+            case 'execute':
+                this.cpuLog("Executing: ")
+                this.execute();
+                break;
+
+            case 'writeBack':
+                this.cpuLog("WriteBack: ")
+                this.writeBack();
+                break;
+            
+            default:
+                this.log("Something Went Wrong, Pipeline Not Performing FDEW");
         }
         
-        else if (this.pipelineStep == "decode") {
-
-            this.decode();
-        }
-
-        else if (this.pipelineStep == "execute") {
-
-            this.execute();
-        }
-
-        
-        this.writeBack();
-
         this.interruptCheck();
     }
 
