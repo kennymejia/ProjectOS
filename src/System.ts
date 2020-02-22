@@ -55,9 +55,9 @@ export class System extends Hardware {
         Initialize all the hardware to the system (analogous to you assembling the physical components together)
          */
         this.log("[****************** Hardware Initialization - Begin]");
-        this._CPU = new Cpu();
         this._MEMORY = new Memory();
-        this._MemoryManagementUnit = new MemoryManagementUnit(this._CPU,this._MEMORY);
+        this._MemoryManagementUnit = new MemoryManagementUnit(this._MEMORY);
+        this._CPU = new Cpu(this._MemoryManagementUnit);
         this._IRQ_CONTROLLER = new InterruptController(this._CPU);
 
         // the clock gets passed all of the hardware listening for clock pulses

@@ -5,12 +5,11 @@ import { start } from "repl";
 
 export class MemoryManagementUnit extends Hardware {
 
-    constructor(cpu: Cpu, memory: Memory) {
+    constructor(memory: Memory) {
 
         super(0, "MMU");
         this.log("Memory Management Unit Created");
 
-        this.cpu = cpu;
         this.memory = memory;
         this.endianArray = [];
 
@@ -51,8 +50,14 @@ export class MemoryManagementUnit extends Hardware {
         this.isExecuting = false;
     }
 
+    // receiving data from the accumulator 
+    public settingMDR (data:number): void {
+
+        this.memory.setMDR(data);
+    }
+
     // receiving a 16 bit address from the program counter
-    public settingMar (address16Bit): void {
+    public settingMar (address16Bit:number): void {
 
         this.memory.setMAR(address16Bit);
     }
@@ -79,9 +84,12 @@ export class MemoryManagementUnit extends Hardware {
 
     // no register interaction
     // calling read function since registers already set
-    public memoryRead (): void {
+
+    // returning a number after a read
+    public memoryRead (): number {
 
         this.memory.read;
+        return this.memory.getMDR();
     }
 
     // no register interaction
@@ -121,4 +129,5 @@ export class MemoryManagementUnit extends Hardware {
         
         this.log("Debug Mode: Memory Dump Complete");
     }
+    
  }
