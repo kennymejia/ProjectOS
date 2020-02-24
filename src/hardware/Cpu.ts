@@ -59,6 +59,7 @@ export class Cpu extends Hardware implements ClockListener{
         this.pipelineStep = "fetch";
         this.mmu = mmu;
         this.counter = 0;
+        this.temp = 0x00;
     }
 
     public pc: number;
@@ -74,6 +75,7 @@ export class Cpu extends Hardware implements ClockListener{
     public pipelineStep: string;
     public mmu: MemoryManagementUnit;
     public counter: number;
+    public temp: number;
 
     public reset(): void {
         this.pc = 0x0000;
@@ -88,8 +90,8 @@ export class Cpu extends Hardware implements ClockListener{
         this.clockCount = 0;
         this.pipelineStep = "";
         this.counter = 0;
+        this.temp = 0x00;
     }
-
 
     /**
      * Send the CPU an interrupt here!
@@ -231,7 +233,24 @@ export class Cpu extends Hardware implements ClockListener{
 
             case 0x00:
                 this.$00();
-                this.pipelineStep = "";
+                break;
+
+            case 0xEC:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.$EC();
+                break;
+
+            case 0xD0:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.pipelineStep = "execute";
+                break;
+
+            case 0xEE:
+                this.mmu.settingMar(this.pc);
+                this.pc;
+                this.$EE();
             
             default:
                 this.cpuLog("Nothing To Decode, Lets Execute");
@@ -285,6 +304,18 @@ export class Cpu extends Hardware implements ClockListener{
             case 0x00:
                 break;
 
+            case 0xEC:
+                this.$EC();
+                break;
+
+            case 0xD0:
+                this.$D0();
+                break;
+
+            case 0xEE:
+                this.$EE();
+                break;
+
             default:
                 this.cpuLog("Nothing To Execute, Lets Check For Interrupts");
                 this.pipelineStep = "fetch"
@@ -298,6 +329,11 @@ export class Cpu extends Hardware implements ClockListener{
         switch(this.ir) {
             
             case 0x8D:
+                this.mmu.memoryWrite();
+                this.pipelineStep = "fetch";
+                break;
+
+            case 0xEE:
                 this.mmu.memoryWrite();
                 this.pipelineStep = "fetch";
                 break;
@@ -485,22 +521,80 @@ export class Cpu extends Hardware implements ClockListener{
 
     // break, which is a system call
     private $00 (): void {
-        this.cpuLog("");
+
+        // for now throwing an error to terminate program execution
+        throw new Error("Program Execution Was Terminated, Not An Actual Error");
     }
 
     // compare a byte in mem to X reg, sets Z flag if equal
     private $EC (): void {
-        this.cpuLog("");
+        if (this.counter == 0) {
+
+            // getting an 8 bit address so we call our little endian function
+            // incrementing our tracker, tells us whether we are decoding again or executing
+            // we are decoding again in this case since we only have half of an address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "decode";
+            this.counter++;
+        }
+        else if (this.counter == 1) {
+
+            // executing now that we have the full address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter++;
+        }
+        else {
+
+            // coming back in and executing the read from memory
+            // setting the z flag to the difference between x reg and memory location
+            // if its zero then D0 will branch otherwise we wont branch
+            this.zFlag = this.xReg - this.mmu.memoryRead();
+            this.pipelineStep = "fetch";
+            this.counter = 0;
+        }
     }
 
     // branch n bytes if Z flag = 0
     private $D0 (): void {
-        this.cpuLog("");
+        
+        // if the zFlag is 0 when EC was called then x reg and mem location where equal
+        if (this.zFlag == 0) {
+
+            // jumping ahead in the program n locations
+            this.pc = this.pc + this.mmu.memoryRead();
+        }
+        this.pipelineStep = "fetch";
     }
 
     // increment the value of a byte
     private $EE (): void {
-        this.cpuLog("");
+        if (this.counter == 0) {
+
+            // getting an 8 bit address so we call our little endian function
+            // incrementing our tracker, tells us whether we are decoding again or executing
+            // we are decoding again in this case since we only have half of an address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "decode";
+            this.counter++;
+        }
+        else if (this.counter == 1) {
+
+            // executing now that we have the full address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter++;
+        }
+        else {
+
+            // coming back in and executing the read from memory
+            // using temp as a way to hold the data at the memory location
+            this.temp = this.mmu.memoryRead();
+            this.temp = this.temp + 1;
+            this.mmu.settingMDR(this.temp);
+            this.pipelineStep = "writeBack";
+            this.counter = 0;
+        }
     }
 
     // system call
