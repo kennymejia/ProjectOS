@@ -59,10 +59,14 @@ export class Memory extends Hardware implements ClockListener{
     }
 
     public setMAR (mar: number) {
+
+        this.cpuLog("Setting The MAR");
         this.mar = mar;
     }
 
     public setMDR (mdr: number) {
+
+        this.cpuLog("Seeting The MDR");
         this.mdr = mdr;
     }
 

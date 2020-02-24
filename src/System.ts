@@ -50,7 +50,6 @@ export class System extends Hardware {
         console.log("Welcome Back TSIRAM!");
 
         this.log("[****************** System Initialization started]");
-
         /*
         Initialize all the hardware to the system (analogous to you assembling the physical components together)
          */

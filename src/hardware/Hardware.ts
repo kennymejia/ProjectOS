@@ -11,7 +11,7 @@ export class Hardware {
 
     public id: number = 0;
     public name: String = "";
-    private debug: boolean = true;
+    private debug: boolean = false;
     private cpuDebug: boolean = true;
     private date: Date = new Date();
     

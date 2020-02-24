@@ -119,30 +119,32 @@ export class Cpu extends Hardware implements ClockListener{
             "  ClockCount: " + this.clockCount
         );
 
+        // the actual pipeline where FDEW and check for interrupts after each cycle
         switch (this.pipelineStep) {
 
             case "fetch":
-                this.cpuLog("Fetching: ");
+                //this.cpuLog("Fetching: ");
                 this.fetch();
                 break;
             
             case "decode":
-                this.cpuLog("Decoding: ");
+                //this.cpuLog("Decoding: ");
                 this.decode();
                 break;
 
             case "execute":
-                this.cpuLog("Executing: ")
+                //this.cpuLog("Executing: ")
                 this.execute();
                 break;
 
             case "writeBack":
-                this.cpuLog("WriteBack: ")
+                //this.cpuLog("WriteBack: ")
                 this.writeBack();
                 break;
             
             default:
-                this.log("Something Went Wrong, Pipeline Not Performing FDEW");
+                this.cpuLog("Something Went Wrong, Pipeline Not Performing FDEW");
+                break;
         }
         
         this.interruptCheck();
@@ -183,13 +185,18 @@ export class Cpu extends Hardware implements ClockListener{
             case 0xAD:
                 this.mmu.settingMar(this.pc);
                 this.pc++;
-                this.$AD;
+                this.$AD();
                 break;
             
             case 0x8D:
                 this.mmu.settingMar(this.pc);
                 this.pc++;
-                this.$8D;
+                this.$8D();
+                break;
+
+            default:
+                this.cpuLog("Nothing To Decode, Lets Execute");
+                this.pipelineStep = "execute"
                 break;
         }
     }
@@ -206,7 +213,12 @@ export class Cpu extends Hardware implements ClockListener{
                 break;
 
             case 0xAD:
-                this.$AD;
+                this.$AD();
+                break;
+
+            default:
+                this.cpuLog("Nothing To Execute, Lets Check For Interrupts");
+                this.pipelineStep = "fetch"
                 break;
         }
 
@@ -214,6 +226,17 @@ export class Cpu extends Hardware implements ClockListener{
 
     private writeBack(): void {
 
+        switch(this.ir) {
+            
+            case 0x8D:
+                this.mmu.memoryWrite();
+                break;
+
+            default:
+                this.cpuLog("Nothing To WriteBack");
+                break;
+            
+        }
     }
 
     private interruptCheck(): void {
@@ -230,7 +253,6 @@ export class Cpu extends Hardware implements ClockListener{
 
     // load the accumulator with a consrant
     private $A9 (constant:number): void {
-        
         this.acc = constant;
         this.pipelineStep = "fetch";
     }
@@ -244,8 +266,8 @@ export class Cpu extends Hardware implements ClockListener{
             // incrementing our tracker, tells us whether we are decoding again or executing
             // we are decoding again in this case since we only have half of an address
             this.mmu.littleEndian(this.mmu.memoryRead());
-            this.counter++;
             this.pipelineStep = "decode";
+            this.counter++;
         }
         else if (this.counter == 1) {
 
@@ -256,9 +278,10 @@ export class Cpu extends Hardware implements ClockListener{
         }
         else {
 
+            // coming back in and executing the write to memory
             this.acc = this.mmu.memoryRead();
-            this.counter = 0;
             this.pipelineStep = "fetch";
+            this.counter = 0;
         }
     }
 
@@ -271,8 +294,8 @@ export class Cpu extends Hardware implements ClockListener{
             // incrementing our tracker, tells us whether we are decoding again or executing
             // we are decoding again in this case since we only have half of an address
             this.mmu.littleEndian(this.mmu.memoryRead());
-            this.counter++;
             this.pipelineStep = "decode";
+            this.counter++;
         }
         else if (this.counter == 1) {
 
@@ -283,9 +306,9 @@ export class Cpu extends Hardware implements ClockListener{
         }
         else {
 
-            this.acc = this.mmu.memoryRead();
+            this.mmu.settingMDR(this.acc);
+            this.pipelineStep = "writeBack";
             this.counter = 0;
-            this.pipelineStep = "fetch";
         }
     }
 

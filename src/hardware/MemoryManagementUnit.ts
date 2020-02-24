@@ -88,7 +88,7 @@ export class MemoryManagementUnit extends Hardware {
     // returning a number after a read
     public memoryRead (): number {
 
-        this.memory.read;
+        this.memory.read();
         return this.memory.getMDR();
     }
 
@@ -96,7 +96,7 @@ export class MemoryManagementUnit extends Hardware {
     // calling write function since memory already set
     public memoryWrite (): void {
 
-        this.memory.write;
+        this.memory.write();
     }
 
     // writting a program immediately into memory
