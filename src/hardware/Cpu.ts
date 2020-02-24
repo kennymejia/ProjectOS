@@ -141,9 +141,9 @@ export class Cpu extends Hardware implements ClockListener{
                 //this.cpuLog("WriteBack: ")
                 this.writeBack();
                 break;
-            
+
             default:
-                this.cpuLog("Something Went Wrong, Pipeline Not Performing FDEW");
+                this.cpuLog("Something Went Wrong, Or The Program Was Automatically Terminated");
                 break;
         }
         
@@ -165,7 +165,7 @@ export class Cpu extends Hardware implements ClockListener{
         // loading the IR with whatever instruction is in the MDR
         this.ir = this.mmu.memoryRead();
 
-        // seeting the tracker to decode or the next step in the pipeline
+        // setting the tracker to decode
         this.pipelineStep = "decode";
     }
 
@@ -194,6 +194,45 @@ export class Cpu extends Hardware implements ClockListener{
                 this.$8D();
                 break;
 
+            case 0x6D:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.$6D();
+                break;
+
+            case 0xA2:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.pipelineStep = "execute";
+                break;
+
+            case 0xAE:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.$AE();
+                break;
+
+            case 0xA0:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.pipelineStep = "execute";
+                break;
+
+            case 0xAC:
+                this.mmu.settingMar(this.pc);
+                this.pc++;
+                this.$AC();
+                break;
+
+            case 0xEA:
+                this.$EA();
+                this.pipelineStep = "fetch";
+                break;
+
+            case 0x00:
+                this.$00();
+                this.pipelineStep = "";
+            
             default:
                 this.cpuLog("Nothing To Decode, Lets Execute");
                 this.pipelineStep = "execute"
@@ -216,6 +255,36 @@ export class Cpu extends Hardware implements ClockListener{
                 this.$AD();
                 break;
 
+            case 0x8D:
+                this.$8D();
+                break;
+
+            case 0x6D:
+                this.$6D();
+                break;
+
+            case 0xA2:
+                this.$A2(this.mmu.memoryRead());
+                break;
+
+            case 0xAE:
+                this.$AE();
+                break;
+
+            case 0xA0:
+                this.$A0(this.mmu.memoryRead());
+                break;
+
+            case 0xAC:
+                this.$AC();
+                break;
+
+            case 0xEA:
+                break;
+
+            case 0x00:
+                break;
+
             default:
                 this.cpuLog("Nothing To Execute, Lets Check For Interrupts");
                 this.pipelineStep = "fetch"
@@ -230,6 +299,7 @@ export class Cpu extends Hardware implements ClockListener{
             
             case 0x8D:
                 this.mmu.memoryWrite();
+                this.pipelineStep = "fetch";
                 break;
 
             default:
@@ -246,12 +316,11 @@ export class Cpu extends Hardware implements ClockListener{
             this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
             this.log("CPU Sees: " + this.interrupt.outputBuffer.printQueue());
             this.interrupt.outputBuffer.dequeue();
-            
         }
 
     }
 
-    // load the accumulator with a consrant
+    // load the accumulator with a constant
     private $A9 (constant:number): void {
         this.acc = constant;
         this.pipelineStep = "fetch";
@@ -278,7 +347,7 @@ export class Cpu extends Hardware implements ClockListener{
         }
         else {
 
-            // coming back in and executing the write to memory
+            // coming back in and executing the read from memory
             this.acc = this.mmu.memoryRead();
             this.pipelineStep = "fetch";
             this.counter = 0;
@@ -306,6 +375,7 @@ export class Cpu extends Hardware implements ClockListener{
         }
         else {
 
+            // the accumulator being placed in the MDR
             this.mmu.settingMDR(this.acc);
             this.pipelineStep = "writeBack";
             this.counter = 0;
@@ -313,33 +383,104 @@ export class Cpu extends Hardware implements ClockListener{
     }
 
     // add with carry, result stored in accumulator
+    // if time permits going back to add carry flag
     private $6D (): void {
-        this.cpuLog("");
+        
+        if (this.counter == 0) {
+
+            // getting an 8 bit address so we call our little endian function
+            // incrementing our tracker, tells us whether we are decoding again or executing
+            // we are decoding again in this case since we only have half of an address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "decode";
+            this.counter++;
+        }
+        else if (this.counter == 1) {
+
+            // executing now that we have the full address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter++;
+        }
+        else {
+
+            // the accumulator being added with the MDR
+            this.acc = this.acc + this.mmu.memoryRead();
+            this.pipelineStep = "fetch";
+            this.counter = 0;
+        }
     }
 
     // load the X register with a constant
-    private $A2 (): void {
-        this.cpuLog("");
+    private $A2 (constant: number): void {
+        this.xReg = constant;
+        this.pipelineStep = "fetch";
     }
 
     // load the X register from memory
     private $AE(): void {
-        this.cpuLog("");
+
+        if (this.counter == 0) {
+
+            // getting an 8 bit address so we call our little endian function
+            // incrementing our tracker, tells us whether we are decoding again or executing
+            // we are decoding again in this case since we only have half of an address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "decode";
+            this.counter++;
+        }
+        else if (this.counter == 1) {
+
+            // executing now that we have the full address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter++;
+        }
+        else {
+
+            // coming back in and executing the read from memory
+            this.xReg = this.mmu.memoryRead();
+            this.pipelineStep = "fetch";
+            this.counter = 0;
+        }
     }
 
     // load the Y register with a constant
-    private $A0 (): void {
-        this.cpuLog("");
+    private $A0 (constant: number): void {
+        this.yReg = constant;
+        this.pipelineStep = "fetch";
     }   
 
     // load the Y register from memory
     private $AC (): void {
-        this.cpuLog("");
+        if (this.counter == 0) {
+
+            // getting an 8 bit address so we call our little endian function
+            // incrementing our tracker, tells us whether we are decoding again or executing
+            // we are decoding again in this case since we only have half of an address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "decode";
+            this.counter++;
+        }
+        else if (this.counter == 1) {
+
+            // executing now that we have the full address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter++;
+        }
+        else {
+
+            // coming back in and executing the read from memory
+            this.yReg = this.mmu.memoryRead();
+            this.pipelineStep = "fetch";
+            this.counter = 0;
+        }
     }
 
     // no operation
     private $EA (): void {
-        this.cpuLog("");
+        this.cpuLog("No Operation");
     }
 
     // break, which is a system call

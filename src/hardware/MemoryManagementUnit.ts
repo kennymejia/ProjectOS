@@ -76,6 +76,8 @@ export class MemoryManagementUnit extends Hardware {
 
             let address16Bit = +this.endianArray.toString();
 
+            this.cpuLog("The Endian Address: " + address16Bit);
+
             this.memory.setMAR(address16Bit);
     
             this.endianArray = [];
