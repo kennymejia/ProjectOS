@@ -326,7 +326,6 @@ export class Cpu extends Hardware implements ClockListener{
                 break;
 
             case 0xFF:
-                this.mmu.settingMar(this.pc);
                 this.$FF();
                 break;
 
@@ -651,19 +650,19 @@ export class Cpu extends Hardware implements ClockListener{
             this.pipelineStep = "execute";
             this.counter = 3;
             this.pc++;
+            this.mmu.settingMar(this.pc);
         }
         else if (this.counter == 3) {
             // executing now that we have the full address
-            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pc = this.mmu.littleEndian(this.mmu.memoryRead());
             this.pipelineStep = "execute";
             this.counter = 4;
-            this.pc++;
         }
         else {
 
             // reading the memory location
             this.yReg = this.mmu.memoryRead();
-
+            
             if (this.yReg == 0x00) {
 
                 // terminate the string output
@@ -677,6 +676,7 @@ export class Cpu extends Hardware implements ClockListener{
                 // updating the PC here since we are still in execute step
                 process.stdout.write(this.ascii.byteToCharacter(this.yReg));
                 this.pc++;
+                this.mmu.settingMar(this.pc);
             }
         }
     }
