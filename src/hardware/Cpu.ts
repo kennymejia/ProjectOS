@@ -258,7 +258,6 @@ export class Cpu extends Hardware implements ClockListener{
 
             case 0xFF:
                 this.mmu.settingMar(this.pc);
-                this.pc++;
                 this.$FF();
                 break;
             
@@ -327,6 +326,7 @@ export class Cpu extends Hardware implements ClockListener{
                 break;
 
             case 0xFF:
+                this.mmu.settingMar(this.pc);
                 this.$FF();
                 break;
 
@@ -617,12 +617,12 @@ export class Cpu extends Hardware implements ClockListener{
         // first part of the function checks to see if we have a 1 or a 2
         if (this.counter == 0) {
 
-            if (this.xReg == 1) {
+            if (this.xReg == 0x01) {
 
                 this.counter = 1;
                 this.pipelineStep = "execute";
             }
-            else if(this.xReg == 2) {
+            else if(this.xReg == 0x02) {
 
                 this.counter = 2;
                 this.pipelineStep = "execute";
@@ -641,45 +641,42 @@ export class Cpu extends Hardware implements ClockListener{
             this.counter = 0;
         }
 
-        // here we print the string
+        // getting our starting address
+        else if (this.counter == 2) {
+
+            // getting an 8 bit address so we call our little endian function
+            // incrementing our tracker, tells us whether we are decoding again or executing
+            // we are decoding again in this case since we only have half of an address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter = 3;
+            this.pc++;
+        }
+        else if (this.counter == 3) {
+            // executing now that we have the full address
+            this.mmu.littleEndian(this.mmu.memoryRead());
+            this.pipelineStep = "execute";
+            this.counter = 4;
+            this.pc++;
+        }
         else {
-            
-            // getting our starting address
-            if (this.counter == 2) {
 
-                // getting an 8 bit address so we call our little endian function
-                // incrementing our tracker, tells us whether we are decoding again or executing
-                // we are decoding again in this case since we only have half of an address
-                this.mmu.littleEndian(this.mmu.memoryRead());
-                this.pipelineStep = "execute";
-                this.counter = 3;
+            // reading the memory location
+            this.yReg = this.mmu.memoryRead();
+
+            if (this.yReg == 0x00) {
+
+                // terminate the string output
+                this.pipelineStep = "fetch";
+                this.counter = 0;
+                this.$00();
             }
-            else if (this.counter == 3) {
-    
-                // executing now that we have the full address
-                this.mmu.littleEndian(this.mmu.memoryRead());
-                this.pipelineStep = "execute";
-                this.counter = 4;
-            }
-            else if (this.counter == 4) {
-    
-                // reading the memory location
-                this.yReg = this.mmu.memoryRead();
+            else {
 
-                if (this.yReg == 0x00) {
-
-                    // terminate the string output
-                    this.pipelineStep = "fetch";
-                    this.counter = 0;
-                    this.$00();
-                }
-                else {
-
-                    // output with our ASCII decoder
-                    // updating the PC here since we are still in execute step
-                    process.stdout.write(this.ascii.byteToCharacter(this.yReg));
-                    this.pc++;
-                }
+                // output with our ASCII decoder
+                // updating the PC here since we are still in execute step
+                process.stdout.write(this.ascii.byteToCharacter(this.yReg));
+                this.pc++;
             }
         }
     }

@@ -15,14 +15,15 @@ export class MemoryManagementUnit extends Hardware {
 
         // instructions used when flashing memory
         //let instructionSet = [0xA9, 0x0D, 0xA9, 0x1D, 0xA9, 0x2D, 0xA9, 0x3F, 0xA9, 0xFF, 0x00];
-        let instructionSet = [0xA2, 0x02, 0xFF, 0x03, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x00];
+        //let instructionSet = [0xA2, 0x02, 0xFF, 0x03, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x00];
+        let instructionSet = [0xAD];
 
         for (let instruction = 0x0000; instruction < instructionSet.length; instruction++) {
 
             this.writeImmediate(instruction, instructionSet[instruction]);
         }
 
-        this.memoryDump(0x0000,0x000F);
+        this.memoryDump(0x0000,instructionSet.length-1);
     }
 
     // MMU knows about both the CPU and the Memory
@@ -63,9 +64,7 @@ export class MemoryManagementUnit extends Hardware {
 
             this.endianArray[0] = address8Bit;
 
-            let address16Bit = +this.endianArray.toString();
-
-            this.cpuLog("The Endian Address: " + address16Bit);
+            let address16Bit = +this.endianArray.join("").toLocaleUpperCase().padStart(4,"0x00");
 
             this.memory.setMAR(address16Bit);
     
@@ -105,20 +104,20 @@ export class MemoryManagementUnit extends Hardware {
 
         memoryDumpArray = memory.slice(startAddress,endAddress+1);
 
-        this.log("Debug Mode: Memory Dump Initialized");
+        this.mmuLog("Debug Mode: Memory Dump Initialized");
         
-        this.log("-------------------------------------------------------------");
+        this.mmuLog("-------------------------------------------------------------");
         for (startAddress; startAddress<= endAddress; startAddress++) {
 
-            this.log (
+            this.mmuLog (
                 
                 "Addr: " + startAddress.toString(16).toLocaleUpperCase().padStart(6,"0x0000") + 
                 "    | " + memoryDumpArray[startAddress].toString(16).padStart(2,"0").toUpperCase()
             );
         }
-        this.log("-------------------------------------------------------------");
+        this.mmuLog("-------------------------------------------------------------");
         
-        this.log("Debug Mode: Memory Dump Complete");
+        this.mmuLog("Debug Mode: Memory Dump Complete");
     }
     
  }

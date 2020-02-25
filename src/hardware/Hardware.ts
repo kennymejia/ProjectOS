@@ -11,7 +11,7 @@ export class Hardware {
 
     public id: number = 0;
     public name: String = "";
-    private debug: boolean = true;
+    private debug: boolean = false;
     private cpuDebug: boolean = true;
     private date: Date = new Date();
     
@@ -24,6 +24,13 @@ export class Hardware {
 
     // used for CPU debugging
     protected cpuLog(message: String): void {
+        
+        if (this.cpuDebug) 
+            console.log("[", "HW -", this.name, "ID:", this.id, "-", "]:", message);
+    }
+
+    // used for mmu debugging
+    protected mmuLog(message: String): void {
         
         if (this.cpuDebug) 
             console.log("[", "HW -", this.name, "ID:", this.id, "-", "]:", message);
