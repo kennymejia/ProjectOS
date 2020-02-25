@@ -40,6 +40,7 @@ import { cpus } from "os";
 import { VirtualKeyboard } from "./VirtualKeyboard";
 import { pipeline } from "stream";
 import { MemoryManagementUnit } from "./MemoryManagementUnit";
+import {Ascii} from "./imp/Ascii";
 
 export class Cpu extends Hardware implements ClockListener{
 
@@ -60,6 +61,7 @@ export class Cpu extends Hardware implements ClockListener{
         this.mmu = mmu;
         this.counter = 0;
         this.temp = 0x00;
+        this.ascii = new Ascii();
     }
 
     public pc: number;
@@ -76,6 +78,7 @@ export class Cpu extends Hardware implements ClockListener{
     public mmu: MemoryManagementUnit;
     public counter: number;
     public temp: number;
+    public ascii: Ascii;
 
     public reset(): void {
         this.pc = 0x0000;
@@ -672,8 +675,9 @@ export class Cpu extends Hardware implements ClockListener{
                 }
                 else {
 
-                    // output and updating the PC here since we are still in execute step
-                    process.stdout.write("    I HAVE TO ADD THE ASCII DECODER NEXT    ");
+                    // output with our ASCII decoder
+                    // updating the PC here since we are still in execute step
+                    process.stdout.write(this.ascii.byteToCharacter(this.yReg));
                     this.pc++;
                 }
             }

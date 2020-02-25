@@ -13,20 +13,9 @@ export class MemoryManagementUnit extends Hardware {
         this.memory = memory;
         this.endianArray = [];
 
-        // instruction set used to flash memory
-        let instructionSet = [
-            0xA9, 
-            0x0D, 
-            0xA9, 
-            0x1D, 
-            0xA9, 
-            0x2D, 
-            0xA9, 
-            0x3F, 
-            0xA9, 
-            0xFF, 
-            0x00
-        ];
+        // instructions used when flashing memory
+        //let instructionSet = [0xA9, 0x0D, 0xA9, 0x1D, 0xA9, 0x2D, 0xA9, 0x3F, 0xA9, 0xFF, 0x00];
+        let instructionSet = [0xA2, 0x02, 0xFF, 0x03, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x00];
 
         for (let instruction = 0x0000; instruction < instructionSet.length; instruction++) {
 
