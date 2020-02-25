@@ -535,6 +535,7 @@ export class Cpu extends Hardware implements ClockListener{
     // break, which is a system call
     private $00 (): void {
 
+        this.mmu.memoryDump(0x00, 0x0F);
         // for now throwing an error to terminate program execution
         throw new Error("Program Execution Was Terminated, Not An Actual Error");
     }
@@ -654,6 +655,7 @@ export class Cpu extends Hardware implements ClockListener{
         }
         else if (this.counter == 3) {
             // executing now that we have the full address
+            this.temp = this.pc;
             this.pc = this.mmu.littleEndian(this.mmu.memoryRead());
             this.pipelineStep = "execute";
             this.counter = 4;
@@ -666,6 +668,8 @@ export class Cpu extends Hardware implements ClockListener{
             if (this.yReg == 0x00) {
 
                 // terminate the string output
+                this.pc = this.temp;
+                this.temp = 0x00;
                 this.pipelineStep = "fetch";
                 this.counter = 0;
                 this.$00();
