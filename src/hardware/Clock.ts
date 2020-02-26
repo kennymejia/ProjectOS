@@ -16,6 +16,7 @@ export class Clock extends Hardware {
         super(0, "CLK");
         this.log("Clock Created");
         this.clockListeningHardware = [];
+        this.cpu = cpu;
         this.addHardware(cpu);
         this.addHardware(memory);
         this.addHardware(interruptController);
@@ -24,6 +25,7 @@ export class Clock extends Hardware {
     public clockCount: number = 0;
     public isExecuting: boolean = false;
     private clockListeningHardware: ClockListener[];
+    private cpu: Cpu;
 
     private addHardware(clockListener: ClockListener) {
         
@@ -35,6 +37,11 @@ export class Clock extends Hardware {
         
         // one elegant line of code calling the pulse method on each hardware piece
         this.clockListeningHardware.forEach(element => element.pulse());
+
+        if (this.cpu.stop == true) {
+
+            this.stopClock();
+        }
     }
 
     public startClock(delay:number) : boolean {

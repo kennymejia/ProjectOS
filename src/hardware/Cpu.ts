@@ -41,6 +41,7 @@ import { VirtualKeyboard } from "./VirtualKeyboard";
 import { pipeline } from "stream";
 import { MemoryManagementUnit } from "./MemoryManagementUnit";
 import {Ascii} from "./imp/Ascii";
+import { System } from "../System";
 
 export class Cpu extends Hardware implements ClockListener{
 
@@ -62,6 +63,7 @@ export class Cpu extends Hardware implements ClockListener{
         this.counter = 0;
         this.temp = 0x00;
         this.ascii = new Ascii();
+        this.stop = false;
     }
 
     public pc: number;
@@ -79,6 +81,7 @@ export class Cpu extends Hardware implements ClockListener{
     public counter: number;
     public temp: number;
     public ascii: Ascii;
+    public stop: boolean;
 
     public reset(): void {
         this.pc = 0x0000;
@@ -230,7 +233,6 @@ export class Cpu extends Hardware implements ClockListener{
                 break;
 
             case 0xEA:
-                this.$EA();
                 this.pipelineStep = "fetch";
                 break;
 
@@ -308,6 +310,7 @@ export class Cpu extends Hardware implements ClockListener{
                 break;
 
             case 0xEA:
+                this.$EA();
                 break;
 
             case 0x00:
@@ -530,14 +533,15 @@ export class Cpu extends Hardware implements ClockListener{
     // no operation
     private $EA (): void {
         this.cpuLog("No Operation");
+        this.pipelineStep = "fetch";
     }
 
     // break, which is a system call
     private $00 (): void {
 
-        this.mmu.memoryDump(0x00, 0x0F);
-        // for now throwing an error to terminate program execution
-        throw new Error("Program Execution Was Terminated, Not An Actual Error");
+        this.mmu.memoryDump(0x00, this.mmu.instructionSet.length-1);
+        // for now stoping the clock 
+        this.stopClock();
     }
 
     // compare a byte in mem to X reg, sets Z flag if equal
@@ -683,6 +687,11 @@ export class Cpu extends Hardware implements ClockListener{
                 this.mmu.settingMar(this.pc);
             }
         }
+    }
+
+    private stopClock (): void {
+
+        this.stop = true;
     }
 }
 

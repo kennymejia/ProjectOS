@@ -13,22 +13,27 @@ export class MemoryManagementUnit extends Hardware {
         this.memory = memory;
         this.endianArray = [];
 
-        // instructions used when flashing memory
-        //let instructionSet = [0xA9, 0x0D, 0xA9, 0x1D, 0xA9, 0x2D, 0xA9, 0x3F, 0xA9, 0xFF, 0x00];
-        //let instructionSet = [0xA2, 0x02, 0xFF, 0x06, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x00];
-        let instructionSet = [0xAD, 0x0E, 0x00, 0x8D, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x000, 0x00, 0x00, 0x00, 0x02];
+        // hardcoded instructions used to test instruction set
+        //this.instructionSet = [0xA9, 0x0D, 0xA9, 0x1D, 0xA9, 0x2D, 0xA9, 0x3F, 0xA9, 0xFF, 0x00];
+        //this.instructionSet = [0xA2, 0x02, 0xFF, 0x06, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x00];
+        //this.instructionSet = [0xAD, 0x0E, 0x00, 0x8D, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02];
+        //this.instructionSet = [0xA9, 0x02, 0x6D, 0x0A, 0x00, 0x8D, 0x0B, 0x00, 0x00, 0x00, 0x03,0x00];
+        //this.instructionSet = [0xA2, 0x08, 0xA0, 0x08, 0xAE, 0x12, 0x00, 0xAC, 0x13, 0x00, 
+        //                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x07];
+        this.instructionSet = [];
 
-        for (let instruction = 0x0000; instruction < instructionSet.length; instruction++) {
+        for (let instruction = 0x0000; instruction < this.instructionSet.length; instruction++) {
 
-            this.writeImmediate(instruction, instructionSet[instruction]);
+            this.writeImmediate(instruction, this.instructionSet[instruction]);
         }
 
-        this.memoryDump(0x0000,instructionSet.length-1);
+        this.memoryDump(0x0000,this.instructionSet.length-1);
     }
 
     // MMU knows about both the CPU and the Memory
     private cpu: Cpu;
     private memory: Memory;
+    public instructionSet: number[];
 
     // Used to manipulate bytes for Little Endian Format Storage
     private endianArray = [];
@@ -109,7 +114,7 @@ export class MemoryManagementUnit extends Hardware {
         this.mmuLog("Debug Mode: Memory Dump Initialized");
         
         this.mmuLog("-------------------------------------------------------------");
-        for (startAddress; startAddress<= endAddress; startAddress++) {
+        for (startAddress; startAddress <= endAddress; startAddress++) {
 
             this.mmuLog (
                 
