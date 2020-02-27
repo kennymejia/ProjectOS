@@ -115,7 +115,7 @@ export class Cpu extends Hardware implements ClockListener{
         
         this.clockCount++;
         this.log("CPU Received Clock Pulse" + " - " + "Clock Count: " + this.clockCount + " - " + "Mode: " + this.mode);
-
+        
         this.cpuLog(
             "CPU State  | " + 
             " PC: " + this.pc.toString(16).toLocaleUpperCase().padStart(6,"0x0000") +
@@ -264,8 +264,8 @@ export class Cpu extends Hardware implements ClockListener{
                 break;
             
             default:
-                this.cpuLog("Nothing To Decode, Lets Execute");
-                this.pipelineStep = "execute"
+                this.cpuLog("Nothing To Decode");
+                this.pipelineStep = "fetch"
                 break;
         }
     }
@@ -567,19 +567,21 @@ export class Cpu extends Hardware implements ClockListener{
             // coming back in and executing the read from memory
             // setting the z flag to the difference between x reg and memory location
             // if its zero then D0 will branch otherwise we wont branch
-            this.zFlag = this.xReg - this.mmu.memoryRead();
+            this.zFlag = this.mmu.memoryRead() - this.xReg;
+            this.cpuLog("Zero Flag Has Been Set")
             this.pipelineStep = "fetch";
             this.counter = 0;
         }
     }
 
-    // branch n bytes if Z flag = 0
+    // branch n bytes if Z flag != 0
     private $D0 (): void {
         
         // if the zFlag is 0 when EC was called then x reg and mem location where equal
-        if (this.zFlag == 0) {
+        if (this.zFlag != 0) {
 
             // jumping ahead in the program n locations
+            this.cpuLog("Branching Now");
             this.pc = this.pc + this.mmu.memoryRead();
         }
         this.pipelineStep = "fetch";
@@ -640,7 +642,7 @@ export class Cpu extends Hardware implements ClockListener{
         // print the integer stored in y reg
         else if (this.counter == 1) {
 
-            process.stdout.write(this.yReg.toString(16).toLocaleUpperCase().padStart(4,"0x00"));
+            process.stdout.write(this.yReg.toString(16).toLocaleUpperCase().padStart(4,"0x00").padEnd(6,", "));
             this.pipelineStep = "fetch";
             this.counter = 0;
         }
@@ -676,7 +678,6 @@ export class Cpu extends Hardware implements ClockListener{
                 this.temp = 0x00;
                 this.pipelineStep = "fetch";
                 this.counter = 0;
-                this.$00();
             }
             else {
 

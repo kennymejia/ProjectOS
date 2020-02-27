@@ -30,6 +30,7 @@ export class Memory extends Hardware implements ClockListener{
         this.isExecuting = false;
 
         for (let address = 0x0000; address < this.memory.length; ++ address) {
+            
             this.memory[address] = 0x00;
         }
 
@@ -51,22 +52,22 @@ export class Memory extends Hardware implements ClockListener{
     }
 
     public getMAR (): number {
+
         return this.mar;
     }
 
     public getMDR (): number {
+
         return this.mdr;
     }
 
     public setMAR (mar: number) {
 
-        //this.cpuLog("Setting The MAR");
         this.mar = mar;
     }
 
     public setMDR (mdr: number) {
 
-        //this.cpuLog("Seeting The MDR");
         this.mdr = mdr;
     }
 
