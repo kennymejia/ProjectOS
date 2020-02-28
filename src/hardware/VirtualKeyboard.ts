@@ -72,7 +72,7 @@ export class VirtualKeyboard extends Hardware implements Interrupt {
             }
 
             // logging what key was pressed for debugging
-            this.log("Key Pressed: " + key);
+            this.vkbLog("Key Pressed: " + key);
 
             // adding the the pressed key to the output buffer using the Queue
             this.outputBuffer.enqueue(key);

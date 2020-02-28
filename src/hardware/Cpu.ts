@@ -66,14 +66,14 @@ export class Cpu extends Hardware implements ClockListener{
         this.stop = false;
     }
 
-    public pc: number;
-    public ir: number;
-    public acc: number;
-    public xReg: number;
-    public yReg: number;
-    public zFlag: number;
-    public interrupt: Interrupt;
-    public mode: Cpu.Mode;
+    private pc: number;
+    private ir: number;
+    private acc: number;
+    private xReg: number;
+    private yReg: number;
+    private zFlag: number;
+    private interrupt: Interrupt;
+    private mode: Cpu.Mode;
     public isExecuting: boolean;
     public clockCount: number;
     public pipelineStep: string;
@@ -367,6 +367,8 @@ export class Cpu extends Hardware implements ClockListener{
             
             this.log("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
             this.log("CPU Sees: " + this.interrupt.outputBuffer.printQueue());
+            this.vkbLog("CPU Acting On Interrupt - IRQ: " + this.interrupt.irq + " From: " + this.interrupt.name);
+            this.vkbLog("CPU Sees: " + this.interrupt.outputBuffer.printQueue());
             this.interrupt.outputBuffer.dequeue();
         }
 
@@ -582,7 +584,15 @@ export class Cpu extends Hardware implements ClockListener{
 
             // jumping ahead in the program n locations
             this.cpuLog("Branching Now");
-            this.pc = this.pc + this.mmu.memoryRead();
+            let pc2CompSigned = parseInt(this.pc.toString(16),16);
+            let n2CompSigned = parseInt(this.mmu.memoryRead().toString(16),16);
+
+            if ((n2CompSigned & 0x8000) > 0) {
+
+                n2CompSigned = n2CompSigned - 0x10000;
+            }
+
+            this.pc = pc2CompSigned + n2CompSigned;
         }
         this.pipelineStep = "fetch";
     }

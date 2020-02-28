@@ -29,9 +29,9 @@ export class Memory extends Hardware implements ClockListener{
         this.mdr = 0x00;
         this.isExecuting = false;
 
-        for (let address = 0x0000; address < this.memory.length; ++ address) {
+        for (let address = 0x0000; address < this.memory.length; address++) {
             
-            this.memory[address] = 0x00;
+            this.memory[address] = 0x0000;
         }
 
     }
