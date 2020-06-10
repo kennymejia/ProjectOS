@@ -1,3 +1,8 @@
+# Notes
+The base of the project was created by Professor Gormanly, a professional lecturer at Marist College
+We were assigned to fill in and complete the project as we learned about the inner workings of a computers operating system
+Due to the COVID-19 pandemic the project was postponed and eventually cancelled halfway through the semester
+
 # tsiram-OS
 Documentation is still under construction...  Mostly just notes right now as I go through this so I do not forget later.
 
